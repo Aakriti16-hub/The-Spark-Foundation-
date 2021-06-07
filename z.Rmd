@@ -1,0 +1,74 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+## The Spark Foundation "GRIP JUNE 2021"
+## Task 1:- Prediction Using Supervised ML
+### By:- Aakriti Pankaj
+
+
+
+
+**Objective:- To predict percentage of a student if he/she study for 9.25 hrs/day.**
+
+**Solution:-**
+
+Read the data from url. Here is the code Chunk for reading url:-
+```{r}
+data <- read.csv(url("https://raw.githubusercontent.com/AdiPersonalWorks/Random/master/student_scores%20-%20student_scores.csv"))
+data
+```
+Plot the relationship between Hours and Scores. Here is the code chunk:-
+```{r}
+plot(data$Hours, data$Scores, col = "blue", pch = 3, xlab = "Hours", ylab = "Scores")
+title(main = "Graph 1:- Relationship between Hours and Scores")
+```
+
+From graph 1, we can see that there is positive relationship between Hours and Scores.
+
+Partiton the data into training set and test set. Here is the code chunk:-
+```{r}
+library(lattice)
+library(ggplot2)
+library(caret)
+set.seed(22)
+inTrain <- createDataPartition(y = data$Scores, p = 0.6, list = FALSE)
+traindata <- data[inTrain,]
+testdata <- data[-inTrain,]
+traindata
+```
+Fit a linear model. Here is the code chunk:-
+```{r}
+lm1 <- lm(Scores ~ Hours, data = traindata)
+summary(lm1)
+```
+Plot prediction of training set and test set with best line of fit. Here is the code chunk:-
+```{r}
+plot(traindata$Hours, traindata$Scores, pch = 3, col = "blue", xlab = "Hours", ylab = "Scores")
+lines(traindata$Hours, predict(lm1), lwd = 3)
+title(main = "Graph 2:- Relationship between Hours and Scores of training set")
+plot(testdata$Hours, testdata$Scores, pch = 3, col = "blue", xlab = "Hours", ylab = "Scores")
+lines(testdata$Hours, predict(lm1, newdata = testdata), lwd = 3)
+title(main = "Graph 3:- Relationship between Hours and Scores of Test set")
+```
+
+From graph 2 and 3, we can see that there is linear relationship between Hours and Scores of both training and test data set.
+
+Calculate training set error. Here is the code chunk:-
+```{r}
+sqrt(sum((lm1$fitted - traindata$Scores)^2))
+```
+Calculate test set error. Here is the code chunk:-
+```{r}
+sqrt(sum((predict(lm1, newdata = testdata) - testdata$Scores)^2))
+```
+Predict score if a student study for 9.25 hrs/ day. Here is the code chunk:-
+```{r}
+newdata <- data.frame(Hours = 9.25)
+predict(lm1, newdata)
+```
+As a result, we get 96.18837% score.
+
+**Conclusion:-**
+Using Supervised ML model, predicted percentage of a student is 96.18837% if he/she study for 9.25 hrs/day.
